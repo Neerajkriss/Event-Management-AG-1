@@ -1,4 +1,4 @@
-import type { Event, Booking, Offer, Complaint, OrganizerRequest, Role } from '@/types';
+import type { Event, Booking, Complaint, OrganizerRequest, Role } from '@/types';
 
 export const eventStatusConfig: Record<Event['status'], { label: string; color: string }> = {
   published: { label: 'Published', color: 'bg-success-100 text-success-700' },
@@ -12,12 +12,6 @@ export const bookingStatusConfig: Record<Booking['status'], { label: string; col
   confirmed: { label: 'Confirmed', color: 'bg-success-100 text-success-700' },
   attended: { label: 'Attended', color: 'bg-brand-100 text-brand-700' },
   cancelled: { label: 'Cancelled', color: 'bg-error-100 text-error-700' },
-};
-
-export const offerStatusConfig: Record<Offer['status'], { label: string; color: string }> = {
-  active: { label: 'Active', color: 'bg-success-100 text-success-700' },
-  expired: { label: 'Expired', color: 'bg-gray-100 text-gray-600' },
-  disabled: { label: 'Disabled', color: 'bg-error-100 text-error-700' },
 };
 
 export const complaintStatusConfig: Record<Complaint['status'], { label: string; color: string }> = {

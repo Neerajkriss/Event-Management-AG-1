@@ -1,19 +1,18 @@
 import { createContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import type { Category, Event, Booking, Offer, Complaint, OrganizerRequest, Feedback, User } from '@/types';
+import type { Category, Event, Booking, Complaint, OrganizerRequest, Feedback, User } from '@/types';
 import {
-  seedCategories, seedEvents, seedBookings, seedOffers, seedComplaints,
+  seedCategories, seedEvents, seedBookings, seedComplaints,
   seedOrganizerRequests, seedFeedback, seedUsers,
 } from '@/data/seed';
 import {
   categoriesService, eventsService, bookingsService,
-  offersService, supportService, seedService,
+  supportService, seedService,
 } from '@/services';
 
 export interface AppState {
   categories: Category[];
   events: Event[];
   bookings: Booking[];
-  offers: Offer[];
   complaints: Complaint[];
   organizerRequests: OrganizerRequest[];
   feedback: Feedback[];
@@ -33,10 +32,6 @@ export interface AppDataContextValue extends AppState {
   addBooking: (bkg: Omit<Booking, 'id' | 'createdAt'>) => void;
   updateBooking: (id: string, patch: Partial<Booking>) => void;
   deleteBooking: (id: string) => void;
-  // Offers
-  addOffer: (off: Omit<Offer, 'id' | 'createdAt'>) => void;
-  updateOffer: (id: string, patch: Partial<Offer>) => void;
-  deleteOffer: (id: string) => void;
   // Complaints
   addComplaint: (cmp: Omit<Complaint, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateComplaint: (id: string, patch: Partial<Complaint>) => void;
@@ -61,7 +56,6 @@ const initialState: AppState = {
   categories: seedCategories,
   events: seedEvents,
   bookings: seedBookings,
-  offers: seedOffers,
   complaints: seedComplaints,
   organizerRequests: seedOrganizerRequests,
   feedback: seedFeedback,
@@ -156,23 +150,6 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
     bookingsService.deleteBooking(id);
   }, []);
 
-  // Offers
-  const addOffer = useCallback((off: Omit<Offer, 'id' | 'createdAt'>) => {
-    const newOff: Offer = { ...off, id: genId('off'), createdAt: new Date().toISOString() };
-    setState((prev) => ({ ...prev, offers: [...prev.offers, newOff] }));
-    offersService.createOffer(newOff);
-  }, []);
-
-  const updateOffer = useCallback((id: string, patch: Partial<Offer>) => {
-    setState((prev) => ({ ...prev, offers: prev.offers.map((o) => o.id === id ? { ...o, ...patch } : o) }));
-    offersService.updateOffer(id, patch);
-  }, []);
-
-  const deleteOffer = useCallback((id: string) => {
-    setState((prev) => ({ ...prev, offers: prev.offers.filter((o) => o.id !== id) }));
-    offersService.deleteOffer(id);
-  }, []);
-
   // Complaints
   const addComplaint = useCallback((cmp: Omit<Complaint, 'id' | 'createdAt' | 'updatedAt'>) => {
     const now = new Date().toISOString();
@@ -222,7 +199,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const deleteFeedback = useCallback((id: string) => {
-    setState((prev) => ({ ...prev, feedback: prev.feedback.filter((f) => f.id !== id) }));
+    setState((prev) => ({ ...prev, feedback: prev.feedback.filter((c) => c.id !== id) }));
     supportService.deleteFeedback(id);
   }, []);
 
@@ -257,9 +234,6 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         addBooking,
         updateBooking,
         deleteBooking,
-        addOffer,
-        updateOffer,
-        deleteOffer,
         addComplaint,
         updateComplaint,
         deleteComplaint,

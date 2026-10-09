@@ -6,9 +6,12 @@ export interface User {
   email: string;
   role: Role;
   avatar: string;
+  password?: string;
+  createdAt?: string;
 }
 
 export interface AuthResponse {
   success: boolean;
+  user?: User;
   error?: string;
 }

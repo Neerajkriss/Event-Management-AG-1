@@ -5,10 +5,11 @@ import { authService } from '@/services/authService';
 
 export interface AuthContextValue {
   user: User | null;
+  currentUser: User | null;
   isAuthed: boolean;
-  login: (user: User) => void;
-  loginWithCredentials: (email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
-  register: (name: string, email: string, password: string, role: Role) => Promise<{ success: boolean; error?: string }>;
+  login: (emailOrUser: string | User, password?: string) => Promise<{ success: boolean; user?: User; error?: string }>;
+  loginWithCredentials: (email: string, password?: string) => Promise<{ success: boolean; user?: User; error?: string }>;
+  register: (name: string, email: string, password: string, role: Role) => Promise<{ success: boolean; user?: User; error?: string }>;
   logout: () => void;
   switchRole: (role: Role) => void;
   users: User[];
@@ -20,19 +21,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [usersList, setUsersList] = useState<User[]>(seedUsers);
 
-  // Initialize session & users list
+  // Initialize session & users list on startup
   useEffect(() => {
-    const cachedUser = authService.getStoredUser();
-    if (cachedUser) {
-      setUser(cachedUser);
+    try {
+      const cachedUser = authService.getStoredUser();
+      if (cachedUser) {
+        setUser(cachedUser);
+      }
+    } catch (err) {
+      console.warn('[AuthContext] Error reading cached user session:', err);
     }
 
     const initUsers = async () => {
       try {
-        const users = await authService.seedUsersIfEmpty(seedUsers);
-        setUsersList(users);
+        const users = await authService.fetchUsers();
+        if (users && users.length > 0) {
+          setUsersList(users);
+        }
       } catch (err) {
-        console.error('Error initializing users:', err);
+        console.error('[AuthContext] Error initializing users list:', err);
       }
     };
 
@@ -44,42 +51,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     authService.setStoredUser(u);
   }, []);
 
-  const login = useCallback((u: User) => persistUser(u), [persistUser]);
+  const login = useCallback(
+    async (emailOrUser: string | User, password?: string): Promise<{ success: boolean; user?: User; error?: string }> => {
+      try {
+        // Direct User object login (e.g. demo role switcher or direct session)
+        if (typeof emailOrUser === 'object' && emailOrUser !== null) {
+          persistUser(emailOrUser);
+          return { success: true, user: emailOrUser };
+        }
+
+        // Standard credential login (email + password)
+        const email = emailOrUser;
+        const res = await authService.loginUser(email, password);
+        if (res.success && res.user) {
+          persistUser(res.user);
+          setUsersList((prev) => {
+            const exists = prev.some((u) => u.email.toLowerCase() === res.user!.email.toLowerCase());
+            return exists ? prev : [...prev, res.user!];
+          });
+          return { success: true, user: res.user };
+        }
+
+        return { success: false, error: res.error || 'Invalid email address or password.' };
+      } catch (err) {
+        console.error('[AuthContext] Unexpected error during login:', err);
+        return { success: false, error: 'An unexpected authentication error occurred.' };
+      }
+    },
+    [persistUser]
+  );
 
   const loginWithCredentials = useCallback(
-    async (email: string, password?: string): Promise<{ success: boolean; error?: string }> => {
-      void password;
-      const normalized = email.trim().toLowerCase();
-
-      // 1. Try Supabase lookup
-      const remoteUser = await authService.lookupUserByEmail(normalized);
-      if (remoteUser) {
-        persistUser(remoteUser);
-        return { success: true };
-      }
-
-      // 2. Fallback check local mock list
-      const match = usersList.find((u) => u.email.toLowerCase() === normalized);
-      if (!match) {
-        return { success: false, error: 'No account found with that email address.' };
-      }
-      persistUser(match);
-      return { success: true };
+    async (email: string, password?: string): Promise<{ success: boolean; user?: User; error?: string }> => {
+      return login(email, password);
     },
-    [persistUser, usersList]
+    [login]
   );
 
   const register = useCallback(
-    async (name: string, email: string, password: string, role: Role): Promise<{ success: boolean; error?: string }> => {
-      void password;
-      const res = await authService.registerUser(name, email, role);
-      if (!res.success || !res.user) {
-        return { success: false, error: res.error || 'Failed to register account.' };
-      }
+    async (name: string, email: string, password: string, role: Role): Promise<{ success: boolean; user?: User; error?: string }> => {
+      try {
+        const res = await authService.registerUser(name, email, password, role);
+        if (!res.success || !res.user) {
+          return { success: false, error: res.error || 'Failed to create account.' };
+        }
 
-      setUsersList((prev) => [...prev, res.user!]);
-      persistUser(res.user);
-      return { success: true };
+        setUsersList((prev) => {
+          const filtered = prev.filter((u) => u.email.toLowerCase() !== res.user!.email.toLowerCase());
+          return [...filtered, res.user!];
+        });
+        persistUser(res.user);
+        return { success: true, user: res.user };
+      } catch (err) {
+        console.error('[AuthContext] Unexpected error during registration:', err);
+        return { success: false, error: 'An unexpected registration error occurred.' };
+      }
     },
     [persistUser]
   );
@@ -101,6 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        currentUser: user,
         isAuthed: user !== null,
         login,
         loginWithCredentials,

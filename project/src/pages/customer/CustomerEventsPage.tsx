@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { CalendarDays, Search } from 'lucide-react';
 import { useAppData, useAuth } from '@/hooks';
-import type { Event, Offer } from '@/types';
+import type { Event } from '@/types';
 import PageHeader from '@/components/ui/PageHeader';
 import EmptyState from '@/components/ui/EmptyState';
 import { EventCard, BookingModal } from '@/components/events';
@@ -9,7 +9,7 @@ import { EventCard, BookingModal } from '@/components/events';
 type PriceFilter = 'all' | 'under-500' | '500-2000' | 'above-2000';
 
 export default function CustomerEventsPage() {
-  const { events, categories, offers, addBooking } = useAppData();
+  const { events, categories, addBooking } = useAppData();
   const { user } = useAuth();
 
   const [search, setSearch] = useState('');
@@ -33,9 +33,6 @@ export default function CustomerEventsPage() {
       return matchesSearch && matchesCategory && matchesPrice;
     });
   }, [events, search, categoryFilter, priceFilter]);
-
-  const getEventOffers = (eventId: string): Offer[] =>
-    offers.filter((o) => o.eventId === eventId && o.status === 'active');
 
   const handleBookingSubmit = (tickets: number, notes: string) => {
     if (!selectedEvent || !user) return;
@@ -134,7 +131,6 @@ export default function CustomerEventsPage() {
             <EventCard
               key={evt.id}
               event={evt}
-              offers={getEventOffers(evt.id)}
               onClick={() => setSelectedEvent(evt)}
             />
           ))}
@@ -145,7 +141,6 @@ export default function CustomerEventsPage() {
       <BookingModal
         open={selectedEvent !== null}
         event={selectedEvent}
-        offers={selectedEvent ? getEventOffers(selectedEvent.id) : []}
         onClose={() => setSelectedEvent(null)}
         onSubmitBooking={handleBookingSubmit}
       />

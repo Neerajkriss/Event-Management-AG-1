@@ -1,14 +1,13 @@
-import { Building2, MapPin, CalendarDays, Users, BadgePercent } from 'lucide-react';
-import type { Event, Offer } from '@/types';
+import { Building2, MapPin, CalendarDays, Users } from 'lucide-react';
+import type { Event } from '@/types';
 import { formatCurrency, formatDate } from '@/utils/format';
 
 interface EventCardProps {
   event: Event;
-  offers?: Offer[];
   onClick: () => void;
 }
 
-export default function EventCard({ event, offers = [], onClick }: EventCardProps) {
+export default function EventCard({ event, onClick }: EventCardProps) {
   const available = event.capacity - event.bookedCount;
 
   return (
@@ -22,14 +21,6 @@ export default function EventCard({ event, offers = [], onClick }: EventCardProp
           alt={event.title}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
-        {offers.length > 0 && (
-          <div className="absolute right-3 top-3">
-            <span className="badge bg-accent-600 text-white shadow-sm">
-              <BadgePercent className="h-3 w-3" />
-              {offers.length} Offer{offers.length > 1 ? 's' : ''}
-            </span>
-          </div>
-        )}
         {available <= 50 && available > 0 && (
           <div className="absolute left-3 top-3">
             <span className="badge bg-warning-500 text-white shadow-sm">

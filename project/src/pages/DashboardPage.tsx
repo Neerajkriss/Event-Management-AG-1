@@ -1,5 +1,5 @@
 import {
-  CalendarDays, Ticket, BadgePercent, MessageSquareWarning,
+  CalendarDays, Ticket, MessageSquareWarning,
   Users, IndianRupee, Clock, ArrowUpRight, CircleDot,
 } from 'lucide-react';
 import { useAuth, useAppData } from '@/hooks';
@@ -52,7 +52,7 @@ const roleLabels: Record<Role, string> = {
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { events, bookings, offers, complaints } = useAppData();
+  const { events, bookings, complaints } = useAppData();
 
   if (!user) return null;
 
@@ -64,7 +64,6 @@ export default function DashboardPage() {
 
   const totalRevenue = bookings.filter((b) => b.status === 'confirmed' || b.status === 'attended').reduce((sum, b) => sum + b.totalPrice, 0);
   const totalTicketsSold = bookings.filter((b) => b.status === 'confirmed' || b.status === 'attended').reduce((sum, b) => sum + b.tickets, 0);
-  const activeOffers = offers.filter((o) => o.status === 'active').length;
   const openComplaints = complaints.filter((c) => c.status === 'open' || c.status === 'in-progress').length;
 
   const recentBookings = bookings.slice(-5).reverse();
@@ -110,10 +109,10 @@ export default function DashboardPage() {
           color="bg-accent-100 text-accent-600"
         />
         <StatCard
-          label={isCustomer ? 'Active Offers' : 'Revenue'}
-          value={isCustomer ? activeOffers : formatCurrency(totalRevenue)}
-          sublabel={isCustomer ? 'Discount codes available' : `${totalTicketsSold} tickets sold`}
-          icon={isCustomer ? BadgePercent : IndianRupee}
+          label={isCustomer ? 'Confirmed Bookings' : 'Revenue'}
+          value={isCustomer ? myBookings.filter((b) => b.status === 'confirmed').length : formatCurrency(totalRevenue)}
+          sublabel={isCustomer ? 'Confirmed event tickets' : `${totalTicketsSold} tickets sold`}
+          icon={isCustomer ? Ticket : IndianRupee}
           color="bg-success-100 text-success-600"
           trend={!isCustomer ? '+8%' : undefined}
         />

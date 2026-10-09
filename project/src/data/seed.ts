@@ -1,4 +1,4 @@
-import type { User, Category, Event, Booking, Offer, Complaint, OrganizerRequest, Feedback } from '@/types';
+import type { User, Category, Event, Booking, Complaint, OrganizerRequest, Feedback } from '@/types';
 
 export const seedUsers: User[] = [
   { id: 'u-admin-001', name: 'Alex Morgan', email: 'alex.admin@eventhub.com', role: 'admin', avatar: 'AM' },
@@ -103,13 +103,6 @@ export const seedBookings: Booking[] = [
   { id: 'bkg-4', eventId: 'evt-5', eventTitle: 'Gourmet Food Festival', userId: 'u-att-001', userName: 'Sam Rivera', userEmail: 'sam.rivera@gmail.com', tickets: 3, totalPrice: 1197, status: 'attended', paid: true, notes: 'Great experience!', createdAt: '2025-08-25T11:00:00Z' },
   { id: 'bkg-5', eventId: 'evt-4', eventTitle: 'Modern Art Exhibition', userId: 'u-att-001', userName: 'Sam Rivera', userEmail: 'sam.rivera@gmail.com', tickets: 2, totalPrice: 598, status: 'cancelled', paid: false, notes: 'Schedule conflict', createdAt: '2025-07-10T16:00:00Z' },
   { id: 'bkg-6', eventId: 'evt-7', eventTitle: 'Indie Night Live', userId: 'u-att-001', userName: 'Sam Rivera', userEmail: 'sam.rivera@gmail.com', tickets: 2, totalPrice: 598, status: 'confirmed', paid: false, notes: 'Looking forward to it!', createdAt: '2025-07-28T18:00:00Z' },
-];
-
-export const seedOffers: Offer[] = [
-  { id: 'off-1', title: 'Early Bird 20% Off', description: 'Get 20% off on Summer Beats Festival tickets for a limited time.', eventId: 'evt-1', eventTitle: 'Summer Beats Festival 2025', discountPercent: 20, code: 'EARLY20', validFrom: '2025-06-01T00:00:00Z', validUntil: '2025-07-01T00:00:00Z', maxUses: 500, usedCount: 342, status: 'active', createdAt: '2025-05-20T10:00:00Z' },
-  { id: 'off-2', title: 'Tech Summit Bundle', description: '15% off when you book 2+ tickets for AI & Future Tech Summit.', eventId: 'evt-2', eventTitle: 'AI & Future Tech Summit', discountPercent: 15, code: 'TECHBUNDLE', validFrom: '2025-07-01T00:00:00Z', validUntil: '2025-09-01T00:00:00Z', maxUses: 200, usedCount: 88, status: 'active', createdAt: '2025-06-25T10:00:00Z' },
-  { id: 'off-3', title: 'Marathon Flash Sale', description: 'Last chance! 30% off City Marathon registration.', eventId: 'evt-3', eventTitle: 'City Marathon 2025', discountPercent: 30, code: 'FLASH30', validFrom: '2025-05-01T00:00:00Z', validUntil: '2025-06-01T00:00:00Z', maxUses: 1000, usedCount: 1000, status: 'expired', createdAt: '2025-04-20T10:00:00Z' },
-  { id: 'off-4', title: 'Foodie Friday Deal', description: 'Buy one get one 50% off on Gourmet Food Festival.', eventId: 'evt-5', eventTitle: 'Gourmet Food Festival', discountPercent: 50, code: 'FOODIE50', validFrom: '2025-08-01T00:00:00Z', validUntil: '2025-09-19T00:00:00Z', maxUses: 300, usedCount: 12, status: 'disabled', createdAt: '2025-07-25T10:00:00Z' },
 ];
 
 export const seedComplaints: Complaint[] = [

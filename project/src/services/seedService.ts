@@ -1,16 +1,16 @@
 import { supabase } from './supabaseClient';
-import type { Category, Event, Booking, Offer, Complaint, OrganizerRequest, Feedback, User } from '@/types';
+import type { Category, Event, Booking, Complaint, OrganizerRequest, Feedback, User } from '@/types';
 import {
-  seedCategories, seedEvents, seedBookings, seedOffers, seedComplaints,
+  seedCategories, seedEvents, seedBookings, seedComplaints,
   seedOrganizerRequests, seedFeedback, seedUsers,
 } from '@/data/seed';
+import { authService } from './authService';
 
 export interface LoadedAppData {
   categories: Category[];
   users: User[];
   events: Event[];
   bookings: Booking[];
-  offers: Offer[];
   complaints: Complaint[];
   organizerRequests: OrganizerRequest[];
   feedback: Feedback[];
@@ -24,7 +24,6 @@ export const seedService = {
         userRes,
         evtRes,
         bkgRes,
-        offRes,
         cmpRes,
         orgRes,
         fbRes,
@@ -33,7 +32,6 @@ export const seedService = {
         supabase.from('users').select('*'),
         supabase.from('events').select('*'),
         supabase.from('bookings').select('*'),
-        supabase.from('offers').select('*'),
         supabase.from('complaints').select('*'),
         supabase.from('organizer_requests').select('*'),
         supabase.from('feedback').select('*'),
@@ -43,49 +41,79 @@ export const seedService = {
       let usersData = userRes.data && userRes.data.length > 0 ? (userRes.data as User[]) : null;
       let eventsData = evtRes.data && evtRes.data.length > 0 ? (evtRes.data as Event[]) : null;
       let bookingsData = bkgRes.data && bkgRes.data.length > 0 ? (bkgRes.data as Booking[]) : null;
-      let offersData = offRes.data && offRes.data.length > 0 ? (offRes.data as Offer[]) : null;
       let complaintsData = cmpRes.data && cmpRes.data.length > 0 ? (cmpRes.data as Complaint[]) : null;
       let orgRequestsData = orgRes.data && orgRes.data.length > 0 ? (orgRes.data as OrganizerRequest[]) : null;
       let feedbackData = fbRes.data && fbRes.data.length > 0 ? (fbRes.data as Feedback[]) : null;
 
       // Seed if empty
       if (!usersData) {
-        await supabase.from('users').insert(seedUsers);
+        try {
+          await supabase.from('users').insert(seedUsers);
+        } catch {
+          // ignore seeding error
+        }
         usersData = seedUsers;
       }
 
+      // Merge local registered users so they always persist in UI
+      const localUsers = authService.getLocalUsers();
+      const userMap = new Map<string, User>();
+      for (const u of seedUsers) userMap.set(u.email.toLowerCase(), u);
+      for (const u of localUsers) userMap.set(u.email.toLowerCase(), u);
+      for (const u of usersData) userMap.set(u.email.toLowerCase(), u);
+      usersData = Array.from(userMap.values());
+
       if (!categoriesData) {
-        await supabase.from('categories').insert(seedCategories);
+        try {
+          await supabase.from('categories').insert(seedCategories);
+        } catch {
+          // ignore
+        }
         categoriesData = seedCategories;
       }
 
       if (!eventsData) {
-        await supabase.from('events').insert(seedEvents);
+        try {
+          await supabase.from('events').insert(seedEvents);
+        } catch {
+          // ignore
+        }
         eventsData = seedEvents;
       }
 
       if (!bookingsData) {
-        await supabase.from('bookings').insert(seedBookings);
+        try {
+          await supabase.from('bookings').insert(seedBookings);
+        } catch {
+          // ignore
+        }
         bookingsData = seedBookings;
       }
 
-      if (!offersData) {
-        await supabase.from('offers').insert(seedOffers);
-        offersData = seedOffers;
-      }
-
       if (!complaintsData) {
-        await supabase.from('complaints').insert(seedComplaints);
+        try {
+          await supabase.from('complaints').insert(seedComplaints);
+        } catch {
+          // ignore
+        }
         complaintsData = seedComplaints;
       }
 
       if (!orgRequestsData) {
-        await supabase.from('organizer_requests').insert(seedOrganizerRequests);
+        try {
+          await supabase.from('organizer_requests').insert(seedOrganizerRequests);
+        } catch {
+          // ignore
+        }
         orgRequestsData = seedOrganizerRequests;
       }
 
       if (!feedbackData) {
-        await supabase.from('feedback').insert(seedFeedback);
+        try {
+          await supabase.from('feedback').insert(seedFeedback);
+        } catch {
+          // ignore
+        }
         feedbackData = seedFeedback;
       }
 
@@ -94,19 +122,21 @@ export const seedService = {
         users: usersData,
         events: eventsData,
         bookings: bookingsData,
-        offers: offersData,
         complaints: complaintsData,
         organizerRequests: orgRequestsData,
         feedback: feedbackData,
       };
     } catch (err) {
       console.error('Error loading data from Supabase, falling back to local seed:', err);
+      const localUsers = authService.getLocalUsers();
+      const userMap = new Map<string, User>();
+      for (const u of seedUsers) userMap.set(u.email.toLowerCase(), u);
+      for (const u of localUsers) userMap.set(u.email.toLowerCase(), u);
       return {
         categories: seedCategories,
-        users: seedUsers,
+        users: Array.from(userMap.values()),
         events: seedEvents,
         bookings: seedBookings,
-        offers: seedOffers,
         complaints: seedComplaints,
         organizerRequests: seedOrganizerRequests,
         feedback: seedFeedback,
@@ -114,3 +144,4 @@ export const seedService = {
     }
   },
 };
+

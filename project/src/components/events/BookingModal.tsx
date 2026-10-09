@@ -1,14 +1,13 @@
 import { useState } from 'react';
 import {
-  Send, MapPin, BadgePercent, Ticket,
+  Send, MapPin, Ticket,
 } from 'lucide-react';
-import type { Event, Offer } from '@/types';
+import type { Event } from '@/types';
 import Modal from '@/components/ui/Modal';
 import { formatCurrency, formatDate } from '@/utils/format';
 
 interface BookingModalProps {
   event: Event | null;
-  offers: Offer[];
   open: boolean;
   onClose: () => void;
   onSubmitBooking: (tickets: number, notes: string) => void;
@@ -16,7 +15,6 @@ interface BookingModalProps {
 
 export default function BookingModal({
   event,
-  offers,
   open,
   onClose,
   onSubmitBooking,
@@ -140,30 +138,6 @@ export default function BookingModal({
           <MapPin className="h-4 w-4 text-gray-400" />
           {event.venue}, {event.location}
         </div>
-
-        {/* Active offers */}
-        {offers.length > 0 && (
-          <div>
-            <h4 className="flex items-center gap-2 text-sm font-semibold text-gray-700">
-              <BadgePercent className="h-4 w-4 text-accent-600" />
-              Active Offers
-            </h4>
-            <div className="mt-2 space-y-2">
-              {offers.map((o) => (
-                <div key={o.id} className="flex items-center justify-between rounded-lg border border-dashed border-accent-200 bg-accent-50/30 p-3">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{o.title}</p>
-                    <p className="text-xs text-gray-500">{o.description}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-mono text-sm font-bold tracking-wider text-accent-700">{o.code}</span>
-                    <p className="text-xs font-medium text-accent-600">{o.discountPercent}% off</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Tags */}
         {event.tags.length > 0 && (

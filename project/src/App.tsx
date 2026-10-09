@@ -19,13 +19,11 @@ import AdminPaymentsPage from '@/pages/admin/AdminPaymentsPage';
 import OrganizerProfilePage from '@/pages/organizer/OrganizerProfilePage';
 import OrganizerEventsPage from '@/pages/organizer/OrganizerEventsPage';
 import OrganizerBookingsPage from '@/pages/organizer/OrganizerBookingsPage';
-import OrganizerOffersPage from '@/pages/organizer/OrganizerOffersPage';
 import OrganizerEarningsPage from '@/pages/organizer/OrganizerEarningsPage';
 import OrganizerFeedbackPage from '@/pages/organizer/OrganizerFeedbackPage';
 
 import CustomerEventsPage from '@/pages/customer/CustomerEventsPage';
 import CustomerBookingsPage from '@/pages/customer/CustomerBookingsPage';
-import CustomerOffersPage from '@/pages/customer/CustomerOffersPage';
 import CustomerComplaintsPage from '@/pages/customer/CustomerComplaintsPage';
 import CustomerFeedbackPage from '@/pages/customer/CustomerFeedbackPage';
 
@@ -43,7 +41,6 @@ const organizerPageMap: Record<string, () => JSX.Element> = {
   'org-profile': OrganizerProfilePage,
   events: OrganizerEventsPage,
   requests: OrganizerBookingsPage,
-  offers: OrganizerOffersPage,
   'org-earnings': OrganizerEarningsPage,
   feedback: OrganizerFeedbackPage,
 };
@@ -51,7 +48,6 @@ const organizerPageMap: Record<string, () => JSX.Element> = {
 const customerPageMap: Record<string, () => JSX.Element> = {
   events: CustomerEventsPage,
   bookings: CustomerBookingsPage,
-  'cust-offers': CustomerOffersPage,
   'cust-complaints': CustomerComplaintsPage,
   'cust-feedback': CustomerFeedbackPage,
 };

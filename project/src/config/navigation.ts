@@ -12,16 +12,14 @@ const allRoles: Role[] = ['admin', 'organizer', 'customer'];
 
 export const navItems: NavItem[] = [
   { id: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard', roles: allRoles },
-  { id: 'events', label: 'Events', icon: 'CalendarDays', roles: allRoles },
+  { id: 'events', label: 'Events', icon: 'CalendarDays', roles: ['organizer', 'customer'] },
   { id: 'categories', label: 'Categories', icon: 'Tags', roles: ['admin'] },
   { id: 'organizers', label: 'Organizers', icon: 'UserCheck', roles: ['admin'] },
   { id: 'users', label: 'Users', icon: 'Users', roles: ['admin'] },
   { id: 'bookings', label: 'My Bookings', icon: 'Ticket', roles: ['customer'] },
-  { id: 'cust-offers', label: 'Active Offers', icon: 'BadgePercent', roles: ['customer'] },
   { id: 'cust-complaints', label: 'Support', icon: 'MessageSquareWarning', roles: ['customer'] },
   { id: 'cust-feedback', label: 'My Reviews', icon: 'Star', roles: ['customer'] },
   { id: 'requests', label: 'Bookings', icon: 'ClipboardList', roles: ['admin', 'organizer'] },
-  { id: 'offers', label: 'Offers', icon: 'BadgePercent', roles: ['organizer'] },
   { id: 'complaints', label: 'Complaints', icon: 'MessageSquareWarning', roles: ['admin'] },
   { id: 'feedback', label: 'Feedback', icon: 'Star', roles: ['admin', 'organizer'] },
   { id: 'payments', label: 'Payment Reports', icon: 'IndianRupee', roles: ['admin'] },
